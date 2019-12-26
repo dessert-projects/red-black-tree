@@ -7,7 +7,7 @@ void run_tests() {
 
 int main(int argc, const char *argv[]) {
     printf("red black tree demo.\n");
-    printf("from murmur.wheel@gmail.com\n");
+    printf("by murmur.wheel@gmail.com\n");
 
     run_tests();
 

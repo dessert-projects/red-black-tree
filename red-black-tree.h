@@ -9,16 +9,10 @@ using val_t = int;
 key_t key(Node *node);
 val_t val(Node *node);
 
-// 插入
+// 插入，删除，查找，更新
 Node *insert(Node *root, key_t key, val_t val);
-
-// 移除
 Node *erase(Node *root, Node *node);
-
-// 返回等于 key 的第一个元素
 Node *find(Node *root, key_t key);
-
-// 更新节点值
 Node *update(Node *root, key_t key, val_t val);
 
 // 迭代器

@@ -62,8 +62,19 @@ Node *find(Node *root, key_t key) {
     if (!root)
         return nullptr;
 
-    // 在左子树中查找
-    return nullptr;
+    Node *res = nullptr;
+    if (key > root->key) {
+        res = find(root->right, key);
+    } else {
+        // 首先在左子树中查找，如果左子树中未发现对应的结果，在判断 root
+        // 是不是我们所期望的值
+        res = find(root->left, key);
+        if (!res && root->key == key) {
+            res = root;
+        }
+    }
+
+    return res;
 }
 
 // 更新红黑树中的值，如果 key 不在树中，则向树中插入一个新的节点
