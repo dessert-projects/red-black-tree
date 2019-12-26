@@ -4,17 +4,26 @@
 using namespace std;
 
 struct Node {
+    // 指向此节点的链接的颜色
     bool is_red = false;
+
+    // 层级关系
     Node *left = nullptr;
     Node *right = nullptr;
     Node *parent = nullptr;
 
+    // 键值对
     key_t key = key_t();
     val_t val = val_t();
 };
 
+// 判断节点是否是红节点，nullptr 被认为是黑节点
+bool is_red(Node *node) {
+    return node && node->is_red;
+}
+
+// 构造节点
 Node *make_node(key_t key, val_t val) {
-    // 构造节点
     auto node = new Node();
     node->key = key;
     node->val = val;
@@ -35,13 +44,14 @@ Node *insert(Node *root, key_t key, val_t val) {
     if (!root)
         return make_node(key, val);
 
-    if (root->key > key) {
-        root->left = insert(root->left, key, val);
-    } else {
+    // 自底向上插入
+    if (key > root->key) {
         root->right = insert(root->right, key, val);
+    } else {
+        root->left = insert(root->left, key, val);
     }
 
-    // 配平红黑树
+    // 通过旋转来配平红黑树
 
     return nullptr;
 }
@@ -79,9 +89,9 @@ Node *find(Node *root, key_t key) {
 
 // 更新红黑树中的值，如果 key 不在树中，则向树中插入一个新的节点
 Node *update(Node *root, key_t key, val_t val) {
-    auto it = find(root, key);
-    if (it) {
-        it->val = val;
+    auto ptr = find(root, key);
+    if (ptr) {
+        ptr->val = val;
     } else {
         root = insert(root, key, val);
     }
@@ -123,7 +133,7 @@ Node *next(Node *node) {
         return begin(node->right);
     }
 
-    // 在父节点中寻找一个中序遍历的下一个元素
+    // 在父辈中查找
     while (node->parent && node->parent->right == node) {
         node = node->parent;
     }
@@ -141,7 +151,7 @@ Node *prev(Node *node) {
         return end(node->left);
     }
 
-    // 在父辈节点中查找
+    // 在父辈中查找
     while (node->parent && node->parent->left == node) {
         node = node->parent;
     }
@@ -159,10 +169,22 @@ Node *upper_bound(Node *root, key_t key) {
 
 int distance(Node *node1, Node *node2) {
     // 中序遍历 node1 到 node2 的距离
-    return 0;
+    int res = 0;
+    while (node1 != node2) {
+        node1 = next(node1);
+        res++;
+    }
+    return res;
 }
 
 int count(Node *root, key_t key) {
     // 和 key 相等的元素数目
-    return 0;
+    int res = 0;
+    auto ptr = find(root, key);
+    while (ptr && ptr->key == key) {
+        res++;
+        ptr = next(ptr);
+    }
+
+    return res;
 }
