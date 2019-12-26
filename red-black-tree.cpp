@@ -3,6 +3,16 @@
 
 using namespace std;
 
+struct Node {
+    bool is_red = false;
+    Node* left = nullptr;
+    Node* right = nullptr;
+    Node* parent = nullptr;
+
+    key_t key = key_t();
+    val_t val = val_t();
+};
+
 Node* make_node(key_t key, val_t val) {
     // 构造节点
     auto node = new Node();
@@ -10,6 +20,14 @@ Node* make_node(key_t key, val_t val) {
     node->val = val;
 
     return node;
+}
+
+key_t key(Node* node) {
+    return node->key;
+}
+
+val_t val(Node* node) {
+    return node->val;
 }
 
 Node* insert(Node* root, key_t key, val_t val) {

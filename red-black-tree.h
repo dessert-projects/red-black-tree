@@ -1,18 +1,13 @@
 #ifndef RED_BLACK_TREE_H
 #define RED_BLACK_TREE_H
 
+struct Node;
 using key_t = int;
 using val_t = int;
 
-struct Node {
-    bool is_red = false;
-    Node* left = nullptr;
-    Node* right = nullptr;
-    Node* parent = nullptr;
-
-    key_t key = key_t();
-    val_t val = val_t();
-};
+// 获取节点 key 和 val
+key_t key(Node* node);
+val_t val(Node* node);
 
 // 插入
 Node* insert(Node* root, key_t key, val_t val);
