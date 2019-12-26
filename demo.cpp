@@ -5,9 +5,9 @@ void run_tests() {
     printf("tests\n");
 }
 
-int main(int argc, const char* argv[]) {
-    printf("red black tree demo\n");
-    printf("write by murmur.wheel@gmail.com\n");
+int main(int argc, const char *argv[]) {
+    printf("red black tree demo.\n");
+    printf("from murmur.wheel@gmail.com\n");
 
     run_tests();
 
