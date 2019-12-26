@@ -41,6 +41,8 @@ Node *insert(Node *root, key_t key, val_t val) {
         root->right = insert(root->right, key, val);
     }
 
+    // 配平红黑树
+
     return nullptr;
 }
 
@@ -76,8 +78,8 @@ Node *update(Node *root, key_t key, val_t val) {
     return root;
 }
 
+// 红黑树中序遍历起始元素
 Node *begin(Node *root) {
-    // 获取红黑树的第一个元素
     if (!root)
         return nullptr;
 
@@ -88,8 +90,8 @@ Node *begin(Node *root) {
     return root;
 }
 
+// 红黑树中序遍历末尾元素
 Node *end(Node *root) {
-    // 获取红黑树的末尾元素
     if (!root)
         return nullptr;
 
@@ -100,14 +102,40 @@ Node *end(Node *root) {
     return root;
 }
 
+// 中序遍历的下一个元素
 Node *next(Node *node) {
-    // 中序遍历的下一个元素
-    return nullptr;
+    if (!node)
+        return nullptr;
+
+    // 在右子树中查找
+    if (node->right) {
+        return begin(node->right);
+    }
+
+    // 在父节点中寻找一个中序遍历的下一个元素
+    while (node->parent && node->parent->right == node) {
+        node = node->parent;
+    }
+
+    return node->parent;
 }
 
+// 中序遍历的前一个元素
 Node *prev(Node *node) {
-    // 中序遍历的前一个元素
-    return nullptr;
+    if (!node)
+        return nullptr;
+
+    // 存在左子树时，目标节点一定在左子树中
+    if (node->left) {
+        return end(node->left);
+    }
+
+    // 在父辈节点中查找
+    while (node->parent && node->parent->left == node) {
+        node = node->parent;
+    }
+
+    return node->parent;
 }
 
 Node *lower_bound(Node *root, key_t key) {
