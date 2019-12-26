@@ -31,4 +31,7 @@ int distance(Node *node1, Node *node2);
 // 统计与 key 相等的元素的数目
 int count(Node *root, key_t key);
 
+// 打印此树
+void print(Node* root, const char* name);
+
 #endif

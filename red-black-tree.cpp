@@ -1,5 +1,8 @@
 #include "red-black-tree.h"
+#include <queue>
+#include <sstream>
 #include <stack>
+#include <string>
 
 using namespace std;
 
@@ -17,11 +20,6 @@ struct Node {
     val_t val = val_t();
 };
 
-// 判断节点是否是红节点，nullptr 被认为是黑节点
-bool is_red(Node *node) {
-    return node && node->is_red;
-}
-
 // 构造节点
 Node *make_node(key_t key, val_t val) {
     auto node = new Node();
@@ -29,6 +27,23 @@ Node *make_node(key_t key, val_t val) {
     node->val = val;
 
     return node;
+}
+
+// 判断节点是否是红节点，nullptr 被认为是黑节点
+bool is_red(Node *node) {
+    return node && node->is_red;
+}
+
+// 左旋，旋转是针对 3-节点或者 4- 节点才有的操作
+Node *rotate_left(Node *node) {
+    // 旋转前后，红黑树的平衡关系不变，注意维护 parent 指针
+    return nullptr;
+}
+
+// 右旋
+Node *rotate_right(Node *node) {
+    // 旋转前后，红黑树的平衡关系不变，注意维护 parent 指针
+    return nullptr;
 }
 
 key_t key(Node *node) {
@@ -47,8 +62,10 @@ Node *insert(Node *root, key_t key, val_t val) {
     // 自底向上插入
     if (key > root->key) {
         root->right = insert(root->right, key, val);
+        root->right->parent = root;
     } else {
         root->left = insert(root->left, key, val);
+        root->left->parent = root;
     }
 
     // 通过旋转来配平红黑树
@@ -187,4 +204,51 @@ int count(Node *root, key_t key) {
     }
 
     return res;
+}
+
+// 将树转为 leetcode 的可视化格式
+string to_string(Node *root) {
+    // 将所有的节点输入一个队列中
+    vector<Node *> list;
+    queue<Node *> q;
+    if (root)
+        q.push(root);
+
+    while (!q.empty()) {
+        auto t = q.front();
+        q.pop();
+
+        list.push_back(t);
+
+        if (t) {
+            q.push(t->left);
+            q.push(t->right);
+        }
+    }
+
+    // 将 list 中的内容转为字符序列
+    stringstream stream;
+    stream << "[";
+    for (int i = 0; i < list.size(); ++i) {
+        if (list[i]) {
+            int key = list[i]->key;
+            int val = list[i]->val;
+            stream << "\"(" << key << "," << val << ")\"";
+        } else {
+            stream << "null";
+        }
+
+        if (i + 1 != list.size()) {
+            stream << ",";
+        }
+    }
+    stream << "]";
+
+    return stream.str();
+}
+
+void print(Node *root, const char *name) {
+    auto str = to_string(root);
+
+    printf("%s: %s\n", name, str.c_str());
 }
