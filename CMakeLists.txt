@@ -1,3 +1,3 @@
 project(red-black-tree)
 
-add_executable(demo demo.cpp red-black-tree.cpp)
+add_executable(demo src/demo.cpp src/red-black-tree.cpp)

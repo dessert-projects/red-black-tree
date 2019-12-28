@@ -21,10 +21,11 @@ struct Node {
 };
 
 // 构造节点
-Node *make_node(key_t key, val_t val) {
-    auto node = new Node();
+Node *make(key_t key, val_t val, bool is_red) {
+    Node *node = new Node();
     node->key = key;
     node->val = val;
+    node->is_red = is_red;
 
     return node;
 }
@@ -34,17 +35,64 @@ bool is_red(Node *node) {
     return node && node->is_red;
 }
 
-// 左旋，旋转是针对 3-节点或者 4- 节点才有的操作
+// 翻转节点的颜色
+void flip_color(Node *node) {
+    if (is_red(node->left) && is_red(node->right)) {
+        node->left->is_red = false;
+        node->right->is_red = false;
+        node->is_red = true;
+    }
+}
+
+// 左旋
 Node *rotate_left(Node *node) {
-    // 旋转前后，红黑树的平衡关系不变，注意维护 parent 指针
-    return nullptr;
+    Node *target = node->right;
+
+    // 旋转
+    node->right = target->left;
+    target->left = node;
+
+    // 调整父节点
+    target->parent = node->parent;
+    node->parent = target;
+    if (node->right) {
+        node->right->parent = node;
+    }
+
+    // 调整颜色
+    target->is_red = node->is_red;
+    node->is_red = true;
+
+    return target;
 }
 
 // 右旋
 Node *rotate_right(Node *node) {
-    // 旋转前后，红黑树的平衡关系不变，注意维护 parent 指针
-    return nullptr;
+    Node *target = node->left;
+
+    // 旋转
+    node->left = target->right;
+    target->right = node;
+
+    // 调整父节点
+    target->parent = node->parent;
+    node->parent = target;
+    if (node->left) {
+        node->left->parent = node;
+    }
+
+    // 调整颜色
+    target->is_red = node->is_red;
+    node->is_red = true;
+
+    return target;
 }
+
+// 从坐标的邻居节点移入一个节点
+Node *move_left(Node *node);
+
+// 从右边的邻居节点移入一个节点
+Node *move_right(Node *node);
 
 key_t key(Node *node) {
     return node->key;
@@ -54,40 +102,79 @@ val_t val(Node *node) {
     return node->val;
 }
 
-Node *insert(Node *root, key_t key, val_t val) {
+// 实现细节
+Node *insert_internal(Node *root, key_t key, val_t val) {
     // 空节点
-    if (!root)
-        return make_node(key, val);
-
-    // 自底向上插入
-    if (key > root->key) {
-        root->right = insert(root->right, key, val);
-        root->right->parent = root;
+    if (!root) {
+        root = make(key, val, true);
     } else {
-        root->left = insert(root->left, key, val);
-        root->left->parent = root;
+        // 在子树中插入
+        if (key > root->key) {
+            root->right = insert_internal(root->right, key, val);
+            root->right->parent = root;
+        } else {
+            root->left = insert_internal(root->left, key, val);
+            root->left->parent = root;
+        }
+
+        // 消去 4- 节点
+        // 通过旋转来变更 4-节点的结构
+        if (!is_red(root->left) && is_red(root->right)) {
+            // 处理在红节点的右孩子插入的情形
+            root = rotate_left(root);
+        } else if (is_red(root->left) && is_red(root->left->left)) {
+            // 通过旋转将 4-节点的格式设置为左右对称的样式
+            root = rotate_right(root);
+        }
+        // 翻转颜色来向上传递红链接
+        if (is_red(root->left) && is_red(root->right)) {
+            root->is_red = true;
+            root->left->is_red = false;
+            root->right->is_red = false;
+        }
     }
 
-    // 通过旋转来配平红黑树
+    return root;
+}
 
-    return nullptr;
+Node *insert(Node *root, key_t key, val_t val) {
+    root = insert_internal(root, key, val);
+    // 根节点置为黑色
+    root->is_red = false;
+
+    return root;
 }
 
 Node *erase(Node *root, Node *node) {
-    if (!node)
-        return root;
+    if (!node) {
+        return nullptr;
+    }
 
-    // 首先自 node 向上得出删除的路径
-    // 然后从上往下 3 节点
-    // 再自底向上分解 4- 节点
+    // 删除路径
+    stack<Node *> st;
+    while (node) {
+        st.push(node);
+        node = node->parent;
+    }
 
-    return nullptr;
+    // 自顶向下消去 2- 节点
+    while (st.empty()) {
+        auto ptr = st.top();
+        st.pop();
+    }
+
+    // 删除
+
+    // 自底向上消去 4- 节点
+
+    return root;
 }
 
 // 返回中序遍历下的第一个等于 key 的节点
 Node *find(Node *root, key_t key) {
-    if (!root)
+    if (!root) {
         return nullptr;
+    }
 
     Node *res = nullptr;
     if (key > root->key) {
@@ -106,7 +193,7 @@ Node *find(Node *root, key_t key) {
 
 // 更新红黑树中的值，如果 key 不在树中，则向树中插入一个新的节点
 Node *update(Node *root, key_t key, val_t val) {
-    auto ptr = find(root, key);
+    const auto ptr = find(root, key);
     if (ptr) {
         ptr->val = val;
     } else {
@@ -211,8 +298,9 @@ string to_string(Node *root) {
     // 将所有的节点输入一个队列中
     vector<Node *> list;
     queue<Node *> q;
-    if (root)
+    if (root) {
         q.push(root);
+    }
 
     while (!q.empty()) {
         auto t = q.front();
@@ -229,11 +317,15 @@ string to_string(Node *root) {
     // 将 list 中的内容转为字符序列
     stringstream stream;
     stream << "[";
-    for (int i = 0; i < list.size(); ++i) {
+    for (size_t i = 0; i < list.size(); ++i) {
         if (list[i]) {
-            int key = list[i]->key;
-            int val = list[i]->val;
-            stream << "\"(" << key << "," << val << ")\"";
+            const key_t key = list[i]->key;
+            const val_t val = list[i]->val;
+            if (list[i]->is_red) {
+                stream << "\"R(" << key << "," << val << ")\"";
+            } else {
+                stream << "\"B(" << key << "," << val << ")\"";
+            }
         } else {
             stream << "null";
         }
@@ -248,7 +340,5 @@ string to_string(Node *root) {
 }
 
 void print(Node *root, const char *name) {
-    auto str = to_string(root);
-
-    printf("%s: %s\n", name, str.c_str());
+    printf("%s: %s\n", name, to_string(root).c_str());
 }
