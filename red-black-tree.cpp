@@ -6,19 +6,6 @@
 
 using namespace std;
 
-struct Node {
-    // 指向此节点的链接的颜色
-    bool is_red = false;
-
-    // 层级关系
-    Node *left = nullptr;
-    Node *right = nullptr;
-    Node *parent = nullptr;
-
-    // 键值对
-    key_t key = key_t();
-    val_t val = val_t();
-};
 
 // 构造节点
 Node *make(key_t key, val_t val, bool is_red) {
@@ -341,4 +328,19 @@ string to_string(Node *root) {
 
 void print(Node *root, const char *name) {
     printf("%s: %s\n", name, to_string(root).c_str());
+}
+
+int rb_verify(Node *root) {
+    if (!root) {
+        return 0;
+    }
+
+    const int l = rb_verify(root->left);
+    const int r = rb_verify(root->right);
+
+    if (l != r || l == -1 || r == -1) {
+        return -1;
+    }
+
+    return root->is_red ? l : (l + 1);
 }

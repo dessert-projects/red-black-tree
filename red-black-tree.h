@@ -5,6 +5,20 @@ struct Node;
 using key_t = int;
 using val_t = int;
 
+struct Node {
+    // 指向此节点的链接的颜色
+    bool is_red = false;
+
+    // 层级关系
+    Node *left = nullptr;
+    Node *right = nullptr;
+    Node *parent = nullptr;
+
+    // key - val pair
+    key_t key = key_t();
+    val_t val = val_t();
+};
+
 // 获取节点 key 和 val
 key_t key(Node *node);
 val_t val(Node *node);
@@ -32,6 +46,9 @@ int distance(Node *node1, Node *node2);
 int count(Node *root, key_t key);
 
 // 打印此树
-void print(Node* root, const char* name);
+void print(Node *root, const char *name);
+
+// verify
+int rb_verify(Node *root);
 
 #endif
