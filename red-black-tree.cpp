@@ -6,8 +6,7 @@
 
 using namespace std;
 
-
-// 构造节点
+// make a new node
 Node *make(key_t key, val_t val, bool is_red) {
     Node *node = new Node();
     node->key = key;
@@ -17,12 +16,12 @@ Node *make(key_t key, val_t val, bool is_red) {
     return node;
 }
 
-// 判断节点是否是红节点，nullptr 被认为是黑节点
+// return true if node is a red node, otherwise false will be returned.
 bool is_red(Node *node) {
     return node && node->is_red;
 }
 
-// 翻转节点的颜色
+// flip color of node
 void flip_color(Node *node) {
     if (is_red(node->left) && is_red(node->right)) {
         node->left->is_red = false;
@@ -31,54 +30,54 @@ void flip_color(Node *node) {
     }
 }
 
-// 左旋
+// rotate left
 Node *rotate_left(Node *node) {
     Node *target = node->right;
 
-    // 旋转
+    // rotate
     node->right = target->left;
     target->left = node;
 
-    // 调整父节点
+    // update parent field of each node
     target->parent = node->parent;
     node->parent = target;
     if (node->right) {
         node->right->parent = node;
     }
 
-    // 调整颜色
+    // update color
     target->is_red = node->is_red;
     node->is_red = true;
 
     return target;
 }
 
-// 右旋
+// rotate right
 Node *rotate_right(Node *node) {
     Node *target = node->left;
 
-    // 旋转
+    // modify graph
     node->left = target->right;
     target->right = node;
 
-    // 调整父节点
+    // update parent field foreach node
     target->parent = node->parent;
     node->parent = target;
     if (node->left) {
         node->left->parent = node;
     }
 
-    // 调整颜色
+    // update color
     target->is_red = node->is_red;
     node->is_red = true;
 
     return target;
 }
 
-// 从坐标的邻居节点移入一个节点
+// borrow a node from left neighbour
 Node *move_left(Node *node);
 
-// 从右边的邻居节点移入一个节点
+// borrow a node from right neighbour
 Node *move_right(Node *node);
 
 key_t key(Node *node) {
@@ -89,13 +88,13 @@ val_t val(Node *node) {
     return node->val;
 }
 
-// 实现细节
+// private insert method
 Node *insert_internal(Node *root, key_t key, val_t val) {
-    // 空节点
+    //
     if (!root) {
         root = make(key, val, true);
     } else {
-        // 在子树中插入
+        // insert into left child tree
         if (key > root->key) {
             root->right = insert_internal(root->right, key, val);
             root->right->parent = root;
@@ -104,16 +103,14 @@ Node *insert_internal(Node *root, key_t key, val_t val) {
             root->left->parent = root;
         }
 
-        // 消去 4- 节点
-        // 通过旋转来变更 4-节点的结构
+        // rotate 4-node to standard format if needed
         if (!is_red(root->left) && is_red(root->right)) {
-            // 处理在红节点的右孩子插入的情形
             root = rotate_left(root);
         } else if (is_red(root->left) && is_red(root->left->left)) {
-            // 通过旋转将 4-节点的格式设置为左右对称的样式
             root = rotate_right(root);
         }
-        // 翻转颜色来向上传递红链接
+
+        // pass up red link by flip colors if needed
         if (is_red(root->left) && is_red(root->right)) {
             root->is_red = true;
             root->left->is_red = false;
@@ -126,7 +123,7 @@ Node *insert_internal(Node *root, key_t key, val_t val) {
 
 Node *insert(Node *root, key_t key, val_t val) {
     root = insert_internal(root, key, val);
-    // 根节点置为黑色
+    // root node's color must be black
     root->is_red = false;
 
     return root;
@@ -137,27 +134,27 @@ Node *erase(Node *root, Node *node) {
         return nullptr;
     }
 
-    // 删除路径
+    // helper stack
     stack<Node *> st;
     while (node) {
         st.push(node);
         node = node->parent;
     }
 
-    // 自顶向下消去 2- 节点
+    // top-down deconstruct 2-node
     while (st.empty()) {
         auto ptr = st.top();
         st.pop();
     }
 
-    // 删除
+    // remove node
 
-    // 自底向上消去 4- 节点
+    // deconstruct 4-node
 
     return root;
 }
 
-// 返回中序遍历下的第一个等于 key 的节点
+// get next node at in-order traversal
 Node *find(Node *root, key_t key) {
     if (!root) {
         return nullptr;
@@ -167,9 +164,11 @@ Node *find(Node *root, key_t key) {
     if (key > root->key) {
         res = find(root->right, key);
     } else {
-        // 首先在左子树中查找，如果左子树中未发现对应的结果，在判断 root
-        // 是不是我们所期望的值
+        // find in left child
         res = find(root->left, key);
+
+        // if the target node wont't be found at left tree, and this node is a
+        // right answer, which means this node is we want
         if (!res && root->key == key) {
             res = root;
         }
@@ -178,7 +177,7 @@ Node *find(Node *root, key_t key) {
     return res;
 }
 
-// 更新红黑树中的值，如果 key 不在树中，则向树中插入一个新的节点
+// update key's value correspond, if key is not exist, insert a new key-value
 Node *update(Node *root, key_t key, val_t val) {
     const auto ptr = find(root, key);
     if (ptr) {
@@ -190,7 +189,7 @@ Node *update(Node *root, key_t key, val_t val) {
     return root;
 }
 
-// 红黑树中序遍历起始元素
+// get first node at in-order traversal
 Node *begin(Node *root) {
     if (!root)
         return nullptr;
@@ -202,7 +201,7 @@ Node *begin(Node *root) {
     return root;
 }
 
-// 红黑树中序遍历末尾元素
+// get last value at in-order traversal
 Node *end(Node *root) {
     if (!root)
         return nullptr;
@@ -214,17 +213,17 @@ Node *end(Node *root) {
     return root;
 }
 
-// 中序遍历的下一个元素
+// get next node in in-order travsersal
 Node *next(Node *node) {
     if (!node)
         return nullptr;
 
-    // 在右子树中查找
+    // find at right tree
     if (node->right) {
         return begin(node->right);
     }
 
-    // 在父辈中查找
+    // find at parent tree
     while (node->parent && node->parent->right == node) {
         node = node->parent;
     }
@@ -232,17 +231,17 @@ Node *next(Node *node) {
     return node->parent;
 }
 
-// 中序遍历的前一个元素
+// previous node of in-order traversal
 Node *prev(Node *node) {
     if (!node)
         return nullptr;
 
-    // 存在左子树时，目标节点一定在左子树中
+    //
     if (node->left) {
         return end(node->left);
     }
 
-    // 在父辈中查找
+    // traceback
     while (node->parent && node->parent->left == node) {
         node = node->parent;
     }
@@ -258,8 +257,8 @@ Node *upper_bound(Node *root, key_t key) {
     return nullptr;
 }
 
+// the distance between node1 and node2 when in-order traversal
 int distance(Node *node1, Node *node2) {
-    // 中序遍历 node1 到 node2 的距离
     int res = 0;
     while (node1 != node2) {
         node1 = next(node1);
@@ -269,7 +268,7 @@ int distance(Node *node1, Node *node2) {
 }
 
 int count(Node *root, key_t key) {
-    // 和 key 相等的元素数目
+    //
     int res = 0;
     auto ptr = find(root, key);
     while (ptr && ptr->key == key) {
@@ -280,9 +279,9 @@ int count(Node *root, key_t key) {
     return res;
 }
 
-// 将树转为 leetcode 的可视化格式
+//
 string to_string(Node *root) {
-    // 将所有的节点输入一个队列中
+    //
     vector<Node *> list;
     queue<Node *> q;
     if (root) {
@@ -301,7 +300,7 @@ string to_string(Node *root) {
         }
     }
 
-    // 将 list 中的内容转为字符序列
+    // convert nodes list to character stream
     stringstream stream;
     stream << "[";
     for (size_t i = 0; i < list.size(); ++i) {

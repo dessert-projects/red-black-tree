@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(red-black-tree)
 
-if (MSVC) 
+if (MSVC)
     set(gtest_force_shared_crt on cache bool "" force)
 endif()
 add_subdirectory(googletest)

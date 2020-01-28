@@ -1,12 +1,16 @@
 # red-black-tree
 
-## 概述
+simple implementation of red black tree 
 
-红黑树和 2-3 树是完全等价的。即在红黑树中，通过红色链接相连的两个节点等价于一个 3- 节点。
+## features
 
-## 实现的功能
+- insert or delete
+- iterator operations
+- update
+- boundary
 
-- 增删查改
-- 迭代器
-- 打印为 leetcode 可视化格式
-- 一些测试样例
+## benchmark
+
+|operations|seconds|
+|:-|:-|
+|1|1|
