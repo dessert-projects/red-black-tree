@@ -18,6 +18,11 @@ struct Node {
     // key - val pair
     key_t key = key_t();
     val_t val = val_t();
+
+    Node() = default;
+    explicit Node(bool is_red) : is_red(is_red) {}
+    explicit Node(key_t key, val_t val, bool is_red) :
+      is_red(is_red), key(key), val(val) {}
 };
 
 // get key or val

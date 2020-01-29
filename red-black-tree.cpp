@@ -177,7 +177,8 @@ Node *find(Node *root, key_t key) {
     return res;
 }
 
-// update key's value correspond, if key is not exist, insert a new key-value
+// update the value correspond to key, if key is not exist, insert a new
+// key-value
 Node *update(Node *root, key_t key, val_t val) {
     const auto ptr = find(root, key);
     if (ptr) {
@@ -201,7 +202,7 @@ Node *begin(Node *root) {
     return root;
 }
 
-// get last value at in-order traversal
+// last node of in-order traversal
 Node *end(Node *root) {
     if (!root)
         return nullptr;
@@ -213,7 +214,7 @@ Node *end(Node *root) {
     return root;
 }
 
-// get next node in in-order travsersal
+// the successor of node when in-order traversal the tree
 Node *next(Node *node) {
     if (!node)
         return nullptr;
