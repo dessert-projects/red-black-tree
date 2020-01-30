@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "red-black-tree.h"
-
 #include <stack>
 
 bool valid_greater(Node *root) {
@@ -64,16 +63,16 @@ bool valid_depth(Node *root) {
             return n + 1;
         };
         if (info.node->right) {
-            st.push(
-                Info(info.node->right, depth_of(info.node->right, info.depth)));
+            auto t = info.node->right;
+            st.push(Info(t, depth_of(t, info.depth)));
         }
         if (info.node->left) {
-            st.push(
-                Info(info.node->left, depth_of(info.node->left, info.depth)));
+            auto t = info.node->left;
+            st.push(Info(t, depth_of(t, info.depth)));
         }
     }
 
-    return false;
+    return min_depth == max_depth;
 }
 
 bool valid(Node *root) {
@@ -94,18 +93,8 @@ TEST(rb, valid) {
         root->right = new Node(false);
 
         ASSERT_TRUE(valid_depth(root));
+        ASSERT_TRUE(valid_greater(root));
     }
-}
-
-TEST(rb, verify) {
-    Node *t1 = new Node();
-    t1->is_red = false;
-    t1->left = new Node();
-    t1->left->is_red = false;
-    ASSERT_TRUE(rb_verify(t1) == -1);
-
-    t1->left->is_red = true;
-    ASSERT_TRUE(rb_verify(t1) == 1);
 }
 
 TEST(rb, inert) {
