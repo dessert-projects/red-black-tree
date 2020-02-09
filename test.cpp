@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "red-black-tree.h"
+#include <climits>
 #include <stack>
 
 bool valid_greater(Node *root) {
